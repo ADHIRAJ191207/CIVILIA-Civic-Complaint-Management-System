@@ -1,0 +1,42 @@
+import csv
+import datetime
+from nlp_classifier import classify_complaint  # Import classifier
+
+DATA_FILE = "data/city_complaints.csv"
+
+def collect_complaint():
+    print("\nWelcome to CIVILIA – Civic Complaint System\n")
+    name = input("Enter your name: ")
+    issue = input("Describe the issue (e.g., pothole on road, water leakage): ")
+    location = input("Enter location (e.g., Sector 5, Green Park): ")
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    classification = classify_complaint(issue)
+
+    complaint = {
+        "Name": name,
+        "Issue Description": issue,
+        "Location": location,
+        "Issue Type": classification["IssueType"],
+        "Predicted Urgency": classification["Urgency"],
+        "Tags": ", ".join(classification["Tags"]),
+        "Date": date
+    }
+
+    return complaint
+
+def save_complaint_to_csv(complaint):
+    try:
+        with open(DATA_FILE, mode='a', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=complaint.keys())
+            file.seek(0, 2)
+            if file.tell() == 0:
+                writer.writeheader()
+            writer.writerow(complaint)
+        print("\nComplaint recorded and classified successfully!\n")
+    except Exception as e:
+        print(f"\nError saving complaint: {e}\n")
+
+if __name__ == "__main__":
+    complaint = collect_complaint()
+    save_complaint_to_csv(complaint)
