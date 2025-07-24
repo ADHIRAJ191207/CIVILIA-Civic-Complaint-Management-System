@@ -1,0 +1,39 @@
+import pandas as pd
+
+DATA_FILE = "data/city_complaints.csv"
+
+def load_data():
+    try:
+        return pd.read_csv(DATA_FILE)
+    except FileNotFoundError:
+        print("Complaint file not found.")
+        return pd.DataFrame()
+
+def search_complaints(df):
+    if df.empty:
+        return
+
+    print("Filter options:\n1. Location\n2. Issue Type\n3. Urgency")
+    choice = input("Choose filter (1/2/3): ")
+
+    if choice == "1":
+        val = input("Enter location to search: ")
+        result = df[df["Location"].str.contains(val, case=False, na=False)]
+    elif choice == "2":
+        val = input("Enter issue type to search: ")
+        result = df[df["Issue Type"].str.contains(val, case=False, na=False)]
+    elif choice == "3":
+        val = input("Enter urgency (Low, Medium, High): ")
+        result = df[df["Predicted Urgency"].str.contains(val, case=False, na=False)]
+    else:
+        print("Invalid choice.")
+        return
+
+    if result.empty:
+        print("No complaints found.")
+    else:
+        print(result.to_string(index=False))
+
+if __name__ == "__main__":
+    df = load_data()
+    search_complaints(df)
