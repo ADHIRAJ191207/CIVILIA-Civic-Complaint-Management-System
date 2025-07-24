@@ -1,0 +1,46 @@
+import os
+import sys
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def run_user_mode():
+    print("\n--- USER MODE ---")
+    os.system('python complaint_input.py')
+
+def run_admin_mode():
+    print("\n--- ADMIN MODE ---")
+    print("1. View Dashboard")
+    print("2. Generate Complaint Report")
+    choice = input("Enter choice (1 or 2): ").strip()
+
+    if choice == '1':
+        os.system('python dashboard.py')
+    elif choice == '2':
+        os.system('python report_gen.py')
+    else:
+        print("Invalid option.")
+
+def main():
+    while True:
+        clear()
+        print("========== CIVILIA ==========")
+        print("1. User: Submit a Complaint")
+        print("2. Admin: View Dashboard / Generate Report")
+        print("3. Exit")
+        choice = input("Choose an option: ").strip()
+
+        if choice == '1':
+            run_user_mode()
+        elif choice == '2':
+            run_admin_mode()
+        elif choice == '3':
+            print("Goodbye!")
+            sys.exit()
+        else:
+            print("Invalid input. Try again.")
+
+        input("\nPress Enter to continue...")
+
+if __name__ == "__main__":
+    main()
