@@ -1,0 +1,32 @@
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
+def classify_complaint(text):
+    text = text.lower()
+    issue_type = "Other"
+    urgency = "Low"
+    tags = []
+
+    if "pothole" in text or "road" in text:
+        issue_type = "Pothole"
+        tags.append("Road")
+
+    if "water" in text or "leak" in text:
+        issue_type = "Water Leakage"
+        tags.append("Water")
+
+    if "light" in text or "lamp" in text:
+        issue_type = "Streetlight"
+        tags.append("Electricity")
+
+    if "urgent" in text or "accident" in text or "danger" in text:
+        urgency = "High"
+    elif "soon" in text or "immediate" in text:
+        urgency = "Medium"
+
+    return {
+        "IssueType": issue_type,
+        "Urgency": urgency,
+        "Tags": tags or ["General"]
+    }
