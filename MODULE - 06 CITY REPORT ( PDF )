@@ -1,0 +1,48 @@
+import pandas as pd
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from datetime import datetime
+import os
+
+DATA_FILE = "data/city_complaints.csv"
+OUTPUT_FILE = "CIVILIA_Report.pdf"
+
+def generate_report():
+    if not os.path.exists(DATA_FILE):
+        print("Complaint data not found.")
+        return
+
+    df = pd.read_csv(DATA_FILE)
+
+    c = canvas.Canvas(OUTPUT_FILE, pagesize=A4)
+    width, height = A4
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(200, 800, "CIVILIA – Civic Complaint Report")
+
+    c.setFont("Helvetica", 12)
+    c.drawString(50, 770, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    c.drawString(50, 740, f"Total Complaints: {len(df)}")
+
+    urg_counts = df["Predicted Urgency"].value_counts()
+    c.drawString(50, 720, f"Urgency Breakdown: Low = {urg_counts.get('Low',0)}, Medium = {urg_counts.get('Medium',0)}, High = {urg_counts.get('High',0)}")
+
+    issue_counts = df["Issue Type"].value_counts().head(3)
+    y = 700
+    c.drawString(50, y, "Top Issue Types:")
+    for i, (issue, count) in enumerate(issue_counts.items()):
+        y -= 20
+        c.drawString(70, y, f"{issue}: {count} complaints")
+
+    latest = df.sort_values(by="Date", ascending=False).iloc[0]
+    y -= 40
+    c.drawString(50, y, "Latest Complaint Summary:")
+    c.drawString(70, y - 20, f"Issue: {latest['Issue Description']}")
+    c.drawString(70, y - 40, f"Location: {latest['Location']}")
+    c.drawString(70, y - 60, f"Urgency: {latest['Predicted Urgency']}")
+
+    c.save()
+    print(f"PDF report generated: {OUTPUT_FILE}")
+
+if __name__ == "__main__":
+    generate_report()
