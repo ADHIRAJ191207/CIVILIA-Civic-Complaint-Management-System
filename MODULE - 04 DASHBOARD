@@ -1,0 +1,46 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+DATA_FILE = "data/city_complaints.csv"
+
+def load_data():
+    if not os.path.exists(DATA_FILE):
+        print("No complaints data found.")
+        return pd.DataFrame()
+    return pd.read_csv(DATA_FILE)
+
+def plot_dashboard(df):
+    if df.empty:
+        print("No data to display.")
+        return
+
+    fig, axs = plt.subplots(2, 2, figsize=(14, 10))
+    fig.suptitle("CIVILIA – Complaint Dashboard", fontsize=16)
+
+    df['Date'] = pd.to_datetime(df['Date'])
+    daily_counts = df['Date'].dt.date.value_counts().sort_index()
+    axs[0, 0].plot(daily_counts.index, daily_counts.values, marker='o')
+    axs[0, 0].set_title("Complaints Over Time")
+    axs[0, 0].set_xlabel("Date")
+    axs[0, 0].set_ylabel("Number of Complaints")
+
+    sns.countplot(data=df, x='Issue Type', order=df['Issue Type'].value_counts().index, ax=axs[0, 1])
+    axs[0, 1].set_title("Issue Type Distribution")
+    axs[0, 1].tick_params(axis='x', rotation=45)
+
+    sns.countplot(data=df, x='Predicted Urgency', order=["Low", "Medium", "High"], ax=axs[1, 0])
+    axs[1, 0].set_title("Urgency Level Distribution")
+
+    top_locations = df['Location'].value_counts().head(5)
+    sns.barplot(x=top_locations.index, y=top_locations.values, ax=axs[1, 1])
+    axs[1, 1].set_title("Top 5 Complaint Locations")
+    axs[1, 1].tick_params(axis='x', rotation=45)
+
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.show()
+
+if __name__ == "__main__":
+    df = load_data()
+    plot_dashboard(df)
